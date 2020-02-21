@@ -10,7 +10,8 @@ const setDay = day => dispatch({ type: SET_DAY, value: day})
 const SET_DAY = 'SET_DAY';
 const SET_APPLICATION_DATA = 'SET_APPLICATION_DATA';
 const SET_INTERVIEW = 'SET_INTERVIEW';
-const CANCEL_INTERVIEW = 'CANCEL_INTERVIEW'
+const CANCEL_INTERVIEW = 'CANCEL_INTERVIEW';
+const UPDATE_SPOTS = 'UPDATE_SPOTS';
 
   const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
@@ -19,18 +20,37 @@ const CANCEL_INTERVIEW = 'CANCEL_INTERVIEW'
     interviewers: {}
   });
   // const setDay = day => setState({ ...state, day });
-function reducer(state, action){
-  if(action.type === 'add'){
-    return state + action.value;
-  }
-  if(action.type === 'subtract'){
-    return state - action.value;
-  }
-
-  return state
-}
-
   function reducer(state, action) {
+
+    const spotsRemaining = function () {
+      let spots = 0;
+      for (let day in state.days) {
+        //select the day we currently have selected on screen from the state
+        if ((state.days[day].name === state.day)) {
+          //loop through all appointments for that day
+          for (let id of state.days[day].appointments) {
+            //check if the appointment is null
+            if (state.appointments[id].interview === null) {
+              spots++
+            }
+          }
+        }
+      }
+      return state.days.map((day) => {
+        if (day.name !== state.day) {
+          // if day is not the one we want - return same things
+          return day
+        }
+        // Otherwise, this is the one we want - return an updated value
+        return {
+          ...day, spots
+        }
+      })
+    }
+
+
+
+
     switch (action.type) {
       case SET_DAY:
         return { ...state, day: action.value }
@@ -42,11 +62,13 @@ function reducer(state, action){
           interviewers: action.value[2].data
         }
       case SET_INTERVIEW: {
-
-        return { ...state, appointments: action.interview }
+        return { ...state, appointments: action.interview, days: spotsRemaining() }
       }
       case CANCEL_INTERVIEW: {
-        return { ...state, appointments: action.interview }
+        return { ...state, appointments: action.interview, days: spotsRemaining() }
+      }
+      case UPDATE_SPOTS: {
+        return { ...state, days: spotsRemaining() }
       }
       default:
         throw new Error(
@@ -89,6 +111,9 @@ function reducer(state, action){
 
   }).then(() => dispatch({ type: SET_INTERVIEW, interview: appointments })
     )
+    .then(() => {
+      dispatch({ type: UPDATE_SPOTS})
+    })
   }
 
   function cancelInterview(id) {
@@ -105,6 +130,9 @@ function reducer(state, action){
       .then(() =>
         dispatch({ type: CANCEL_INTERVIEW, interview: appointments })
       )
+      .then(() => {
+        dispatch({ type:UPDATE_SPOTS })
+      })
     )
   }
 
