@@ -42,9 +42,28 @@ export default function Application(props) {
     }
    
   }).then(() => setState({...state, appointments: appointments}))
-  
   }
-  console.log('state', state)
+
+  function cancelInterview(id) {
+    const appointment = {
+      ...state.appointments[id],
+      interview: null
+    };
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment
+    };
+
+    return Promise.resolve(axios.delete(`/api/appointments/${id}`)
+      .then(() =>
+        setState({
+          ...state,
+          appointments
+        })
+      )
+    )
+  }
+  
   
   
 
@@ -88,7 +107,7 @@ export default function Application(props) {
             const interview = getInterview(state, appointment.interview);
             const interviewers = getInterviewersForDay(state, state.day)
             return (
-              <Appointment key={appointment.id} interview={interview} bookInterview={bookInterview} interviewers={interviewers} id={appointment.id} time={appointment.time} />
+              <Appointment key={appointment.id} interview={interview} bookInterview={bookInterview} cancelInterview={cancelInterview} interviewers={interviewers} id={appointment.id} time={appointment.time} />
             );
           })
         }
