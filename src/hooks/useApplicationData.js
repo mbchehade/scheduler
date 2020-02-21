@@ -1,18 +1,60 @@
-import React, { useState, useEffect } from "react";
-import axios from 'axios'
+// import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useEffect, useReducer } from "react";
 
 
 export default function useApplicationData(){
   
   
+const setDay = day => dispatch({ type: SET_DAY, value: day})
+const SET_DAY = 'SET_DAY';
+const SET_APPLICATION_DATA = 'SET_APPLICATION_DATA';
+const SET_INTERVIEW = 'SET_INTERVIEW';
+const CANCEL_INTERVIEW = 'CANCEL_INTERVIEW'
 
-  const [state, setState] = useState({
+  const [state, dispatch] = useReducer(reducer, {
     day: "Monday",
     days: [],
     appointments: {},
     interviewers: {}
   });
-  const setDay = day => setState({ ...state, day });
+  // const setDay = day => setState({ ...state, day });
+function reducer(state, action){
+  if(action.type === 'add'){
+    return state + action.value;
+  }
+  if(action.type === 'subtract'){
+    return state - action.value;
+  }
+
+  return state
+}
+
+  function reducer(state, action) {
+    switch (action.type) {
+      case SET_DAY:
+        return { ...state, day: action.value }
+      case SET_APPLICATION_DATA:
+        return {
+          day: state.day,
+          days: action.value[0].data,
+          appointments: action.value[1].data,
+          interviewers: action.value[2].data
+        }
+      case SET_INTERVIEW: {
+
+        return { ...state, appointments: action.interview }
+      }
+      case CANCEL_INTERVIEW: {
+        return { ...state, appointments: action.interview }
+      }
+      default:
+        throw new Error(
+          `Tried to reduce with unsupported action type: ${action.type}`
+        );
+    }
+  }
+
 
   useEffect(() => {
     Promise.all([
@@ -20,7 +62,8 @@ export default function useApplicationData(){
       Promise.resolve(axios.get("/api/appointments")),
       Promise.resolve(axios.get("/api/interviewers")),
     ]).then((all) => {
-      setState(prev => ({ ...prev, days: all[0].data, appointments: all[1].data, interviewers: all[2].data }));
+      // setState(prev => ({ ...prev, days: all[0].data, appointments: all[1].data, interviewers: all[2].data }));
+      dispatch({ type: SET_APPLICATION_DATA, value: all });
     });
   }, [])
   
@@ -44,7 +87,8 @@ export default function useApplicationData(){
       interview
     }
 
-  }).then(() => setState({...state, appointments: appointments}))
+  }).then(() => dispatch({ type: SET_INTERVIEW, interview: appointments })
+    )
   }
 
   function cancelInterview(id) {
@@ -59,10 +103,7 @@ export default function useApplicationData(){
 
     return Promise.resolve(axios.delete(`/api/appointments/${id}`)
       .then(() =>
-        setState({
-          ...state,
-          appointments
-        })
+        dispatch({ type: CANCEL_INTERVIEW, interview: appointments })
       )
     )
   }
