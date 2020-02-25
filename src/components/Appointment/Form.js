@@ -18,6 +18,12 @@ export default function From(props) {
     setError("")
   }
 
+  const cancel = function () {
+    reset();
+    props.onCancel();
+  }
+
+
 
   const reset = function () {
     setName("");
@@ -45,7 +51,7 @@ export default function From(props) {
       </section>
       <section className="appointment__card-right">
         <section className="appointment__actions">
-          <Button danger onClick={() => props.onCancel(reset())}>Cancel</Button>
+          <Button danger onClick={cancel}>Cancel</Button>
           <Button confirm onClick={validate}>Save</Button>
         </section>
       </section>
