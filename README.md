@@ -10,11 +10,11 @@ The client application communicates with an API server over HTTP, using the JSON
 
 Jest tests are used through the development of the project.
 
-# Project Screenshots
+## Project Screenshots
 
-!["homepage"] (https://github.com/mbchehade/scheduler/blob/master/docs/HomePage.png?raw=true)
-!["appointmentform"] (https://github.com/mbchehade/scheduler/blob/master/docs/Appointment-form.png?raw=true)
-!["deletingappointment"] (https://github.com/mbchehade/scheduler/blob/master/docs/deletingAppointment.png?raw=true)
+!["home page"](https://github.com/mbchehade/scheduler/blob/master/docs/HomePage.png?raw=true)
+!["appointment form"](https://github.com/mbchehade/scheduler/blob/master/docs/Appointment-form.png?raw=true)
+!["deleting appointment"](https://github.com/mbchehade/scheduler/blob/master/docs/deletingAppointment.png?raw=true)
 
 
 ## Setup
